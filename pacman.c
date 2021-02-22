@@ -42,6 +42,8 @@ void update(void) {
   // Player
   tile player_allowed[] = {o, O, e, E};
   if (update_pos(&(game.p), diff, player_allowed, 4)) {
+    printf("Illegal");
+
   }
 }
 void render(void) {
@@ -62,7 +64,7 @@ void on_key(S2D_Event e) {
       game.p.vx = 0.;
       game.p.vy = -SPEEDY;
     }
-    if (strcmp(e.key, "DOWN") == 0) {
+    if (strcmp(e.key, "Down") == 0) {
       game.p.vx = 0.;
       game.p.vy = SPEEDY;
     }

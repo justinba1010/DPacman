@@ -38,6 +38,19 @@ bool update_graph_coords(Positional *p) {
   int i = (int)(float)(p->x / WX);
   int j = (p->y / WY);
 
+  if (i < 0 || i >= COLS) {
+    i += COLS;
+    i %= COLS;
+    p->graphx = i;
+    p->x = (i == 0) ? 0 : COLS * WX;
+  }
+  if (j < 0 || j >= COLS) {
+    j += ROWS;
+    j %= ROWS;
+    p->graphy = j;
+    p->y = (j == 0) ? 0 : ROWS * WY;
+  }
+
   printf("%d, %d\n", i, j);
 
   if (p->graphx != i || p->graphy != j) {
@@ -83,14 +96,17 @@ bool update_pos(Positional *p, float diff, tile* t, int s) {
   p->x += p->vx * diff;
   p->y += p->vy * diff;
   if (update_graph_coords(p)) {
+    if (p->graphx < 0 || p->graphy < 0 || p->graphx >= COLS || p->graphy >= ROWS) {
+      return true;
+    }
     for (int i = 0; i < s; ++i) {
-      if (maze[p->graphx][p->graphy] == t[i]) {
+      if (maze[p->graphy][p->graphx] == t[i]) {
         printf("legal move\n");
         return false;
       }
     }
   } else {
-    return false;
+    return true;
   }
 
   p->x = ox;
