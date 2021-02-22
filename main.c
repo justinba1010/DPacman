@@ -9,7 +9,7 @@ S2D_Window *window;
 #define W_V 10
 #define SECTORS 10
 #define SPEED 25.
-#define GSPEED 12.
+#define GSPEED 22.
 
 typedef struct {
   float x;
@@ -164,6 +164,10 @@ void blinky(void) {
           ghosts[i].lastvalidy = ghosts[i].y;
           break;
       }
+    } else {
+      random_direction(&ghosts[i].vx, &ghosts[i].vy);
+      ghosts[i].x = ghosts[i].lastvalidx;
+      ghosts[u].y = ghosts[i].lastvalidy;
     }
     draw_circ(x + W_W/2., y + W_V/2., 4.0, ghosts[i].r, ghosts[i].g, ghosts[i].b, 1.);
   }
