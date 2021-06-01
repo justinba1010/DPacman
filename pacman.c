@@ -16,6 +16,7 @@ struct timespec currtime;
 void update(void);
 void render(void);
 void load_ghosts(void);
+void draw_ghosts(void);
 void load_player(void);
 void on_key(S2D_Event);
 void draw_pacman(void);
@@ -40,21 +41,32 @@ void update(void) {
   float diff = currtime.tv_sec - tv_sec;
   diff += 1e-9 * (currtime.tv_nsec - tv_nsec);
   // Player
-  tile player_allowed[] = {o, O, e, E};
-  if (update_pos(&(game.p), diff, player_allowed, 4)) {
-    printf("Illegal");
-
+  if (update_pos(&(game.p), diff, player_allowed, p_a)) {
+    printf("illegal");
+  }
+  if (update_pos(&game.ghosts[0].p, diff, ghost_allowed, g_a)) {
+    printf("Huh?");
+    change_direction(&game.ghosts[0].p, gSPEEDX, gSPEEDY);
   }
 }
 void render(void) {
   draw_map();
   draw_pacman();
+  draw_ghosts();
 }
 void load_ghosts(void) {
+  Ghost blinky;
+  blinky.p.x = 9 * WX;
+  blinky.p.y = 7 * WY;
+  update_graph_coords(&(blinky.p));
+  blinky.p.vx = 0;
+  blinky.p.vy = 0;
+  change_direction(&blinky.p, gSPEEDX, gSPEEDY);
+  game.ghosts[0] = blinky;
 }
 void load_player(void) {
-  game.p.x = 1.1 * WX;
-  game.p.y = 1.1 * WY;
+  game.p.x = 1 * WX;
+  game.p.y = 1 * WY;
   update_graph_coords(&(game.p));
 }
 void on_key(S2D_Event e) {
@@ -82,5 +94,22 @@ void draw_pacman(void) {
   float x = game.p.graphx*WX + WX/2.;
   float y = game.p.graphy*WY + WX/2.;
   draw_circ(x, y, PACSIZE, 1., 1., 0., 1.);
+}
+
+float ghost_colors[4][4] = {
+  {1., 0., 0., 1.},
+  {0., 1., 1., 1.},
+  {.88, .26, .5, 1.},
+  {.88, .46, 0., 0.}
+
+};
+
+void draw_ghosts(void) {
+  for (int i = 0; i < 1; ++i) {
+    float x = game.ghosts[i].p.graphx * WX + WX/2.;
+    float y = game.ghosts[i].p.graphy * WY + WY/2.;
+    draw_circ(x, y, PACSIZE, ghost_colors[i][0], ghost_colors[i][1], ghost_colors[i][2], ghost_colors[i][3]);
+
+  }
 }
 

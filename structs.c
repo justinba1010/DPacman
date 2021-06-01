@@ -20,7 +20,7 @@ typedef struct {
   int lives;
   bool chasing;
   int food_collected;
-  Ghost ghosts[];
+  Ghost ghosts[4];
 } Game;
 
 #endif

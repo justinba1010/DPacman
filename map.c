@@ -23,6 +23,11 @@ const tile map[ROWS][COLS] = {
 
 tile maze[ROWS][COLS];
 
+tile player_allowed[] = {o, O, e, E};
+int p_a = 4;
+tile ghost_allowed[] = {o, O, e, E, G};
+int g_a = 5;
+
 void reset_map() {
   for (int i = 0; i < ROWS; ++i) {
     for (int j = 0; j < COLS; ++j) {
@@ -31,10 +36,22 @@ void reset_map() {
   }
 }
 
+float random_sign() {
+  return (float)((rand() & 2) - 1);
+}
+
+bool change_direction(Positional *p, float speedx, float speedy) {
+  printf("%f\n", random_sign());
+  if (p->vx != 0.) {
+    p->vx = 0.;
+    p->vy = random_sign() * speedy;
+  } else {
+    p->vx = random_sign() * speedx;
+    p->vy = 0.;
+  }
+}
+
 bool update_graph_coords(Positional *p) {
-  printf("WX: %f, WY: %f\n", WX, WY);
-  printf("p->x: %f\n", p->x);
-  printf("ahh: %f\n", p->x / WX);
   int i = (int)(float)(p->x / WX);
   int j = (p->y / WY);
 
@@ -87,6 +104,18 @@ void draw_map(void) {
   }
 }
 
+bool legal(int x, int y, tile *t, int s) {
+  if (x >= COLS || x < 0 || y >= ROWS || y < 0) {
+    return  false;
+  }
+  for (int i = 0; i < s; ++i) {
+    if (maze[y][x] == t[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool update_pos(Positional *p, float diff, tile* t, int s) {
   // Updates position if it is a legal movement
   // Returns true if could not move
@@ -99,14 +128,11 @@ bool update_pos(Positional *p, float diff, tile* t, int s) {
     if (p->graphx < 0 || p->graphy < 0 || p->graphx >= COLS || p->graphy >= ROWS) {
       return true;
     }
-    for (int i = 0; i < s; ++i) {
-      if (maze[p->graphy][p->graphx] == t[i]) {
-        printf("legal move\n");
-        return false;
-      }
+    if (legal(p->graphx, p->graphy, t, s)) {
+      return false;
     }
   } else {
-    return true;
+    return false;
   }
 
   p->x = ox;
